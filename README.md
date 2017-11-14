@@ -45,6 +45,30 @@ The entry in the application's `/server/datasources.json` will look like this:
 
 Edit `datasources.json` to add other properties that enable you to connect the data source to a PostgreSQL database.
 
+### Connection Pool Settings
+
+You can also specify connection pool settings in `datasources.json`. For instance you can specify the minimum and the maximum pool size, and the maximum pool client's idle time before closing the client.
+
+Example of `datasource.json`:
+```
+{
+  "mypostgresdb": {
+    "host": "mydbhost",
+    "port": 5432,
+    "url": "postgres://admin:admin@myhost/db",
+    "database": "db1",
+    "password": "password1",
+    "name": "mypostgresdb",
+    "user": "admin",
+    "connector": "postgresql",
+    "min": 5,
+    "max": 200,
+    "idleTimeoutMillis": 60000
+  }
+}
+```
+Check out [node-pg-pool](https://github.com/brianc/node-pg-pool) and [node postgres pooling example](https://github.com/brianc/node-postgres#pooling-example) for more information.
+
 ### Properties
 
 <table>
@@ -99,6 +123,21 @@ Edit `datasources.json` to add other properties that enable you to connect the
       <td>username</td>
       <td>String</td>
       <td>Username to connect to database</td>
+    </tr>
+    <tr>
+      <td>min</td>
+      <td>Integer</td>
+      <td>Minimum number of clients in the connection pool</td>
+    </tr>
+    <tr>
+      <td>max</td>
+      <td>Integer</td>
+      <td>Maximum number of clients in the connection pool</td>
+    </tr>
+    <tr>
+      <td>idleTimeoutMillis</td>
+      <td>Integer</td>
+      <td>Maximum time a client in the pool has to stay idle before closing it</td>
     </tr>
   </tbody>
 </table>
@@ -324,6 +363,43 @@ See [LoopBack types](http://loopback.io/doc/en/lb3/LoopBack-types.html) for de
   </tbody>
 </table>
 
+## Numeric Data Type
+
+**Note**: The [node.js driver for postgres](https://github.com/brianc/node-postgres) by default casts `Numeric` type as a string on `GET` operation. This is to avoid _data precision loss_ since `Numeric` types in postgres cannot be safely converted to JavaScript `Number`.
+
+For details, see the corresponding [driver issue](https://github.com/brianc/node-pg-types/issues/28).
+
+## Querying JSON fields
+
+**Note** The fields you are querying should be setup to use the JSON postgresql data type - see Defining models
+
+Assuming a model such as this:
+
+```json
+{
+  "name": "Customer",
+  "properties": {
+    "address": {
+      "type": "object",
+      "postgresql": {
+        "dataType": "json"
+      }
+    }
+  }
+}
+```
+
+You can query the nested fields with dot notation:
+
+```javascript
+Customer.find({
+  where: {
+    'address.state': 'California'
+  },
+  order: 'address.city'
+})
+```
+
 ## Discovery and auto-migration
 
 ### Model discovery
@@ -350,44 +426,25 @@ Destroying models may result in errors due to foreign key integrity. First delet
 
 ## Running tests
 
-The tests in this repository are mainly integration tests, meaning you will need
-to run them using our preconfigured test server.
-
-1. Ask a core developer for instructions on how to set up test server
-   credentials on your machine
-2. `npm test`
-
-If you wish to run the tests using your own test database instance,
-
-__Set up the database__
-
-1. Go to pgAdmin.  
-By default, the local database is one of the servers under Server Groups > Servers.  
-2. Under Login Roles, add a user called ```strongloop```.
-
-__Change configuration for database connection__
-
-In ```test\init.js```, change the value of ```config``` to be pointing to the local database.  For example, 
+### Own instance
+If you have a local or remote PostgreSQL instance and would like to use that to run the test suite, use the following command:
+- Linux
+```bash
+POSTGRESQL_HOST=<HOST> POSTGRESQL_PORT=<PORT> POSTGRESQL_USER=<USER> POSTGRESQL_PASSWORD=<PASSWORD> POSTGRESQL_DATABASE=<DATABASE> CI=true npm test
 ```
-  var config = {
-    host: 'localhost',
-    port: '5432',
-    database:'strongloop',
-    username: 'postgres',
-    password: 'postgres',
-  };
+- Windows
+```bash
+SET POSTGRESQL_HOST=<HOST> SET POSTGRESQL_PORT=<PORT> SET POSTGRESQL_USER=<USER> SET POSTGRESQL_PASSWORD=<PASSWORD> SET POSTGRESQL_DATABASE=<DATABASE> SET CI=true npm test
 ```
 
-__Troubleshooting__
-
-When running npm test, it runs the ```pretest.js``` which eventually runs ```schema.sql``` to set up the database and tables. 
-If there is problem, you can run the ```schema.sql``` manually.  To do this:
-
-1. Go to SQL Shell (psql)
-2. Run:
+### Docker
+If you do not have a local PostgreSQL instance, you can also run the test suite with very minimal requirements.
+- Assuming you have [Docker](https://docs.docker.com/engine/installation/) installed, run the following script which would spawn a PostgreSQL instance on your local:
+```bash
+source setup.sh <HOST> <PORT> <USER> <PASSWORD> <DATABASE>
 ```
-\i <<file path>>
-
-For example on Windows,
-\i c:\somepath\test\schema.sql
+where `<HOST>`, `<PORT>`, `<USER>`, `<PASSWORD>` and `<DATABASE>` are optional parameters. The default values are `localhost`, `5432`, `root`, `pass` and `testdb` respectively.
+- Run the test:
+```bash
+npm test
 ```

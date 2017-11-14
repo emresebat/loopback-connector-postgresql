@@ -1,3 +1,185 @@
+2017-11-13, Version 3.2.0
+=========================
+
+ * chore:update license (Diana Lau)
+
+ * Add basic json query support (Zak Barbuto)
+
+ * update dependencies (Diana Lau)
+
+ * CODEOWNERS: add zbarbuto (Miroslav Bajtoš)
+
+
+2017-09-26, Version 3.1.0
+=========================
+
+ * Upgrade to pg@7. (Samuel Reed)
+
+ * Add test for transaction support in count() (Jürg Lehni)
+
+ * Add stalebot configuration (Kevin Delisle)
+
+
+2017-08-21, Version 3.0.3
+=========================
+
+ * Create Issue and PR Templates (#291) (Sakib Hasan)
+
+ * Allow migration on schema (ssh24)
+
+ * Update translated strings Q3 2017 (Allen Boone)
+
+ * Fix integer data type (ssh24)
+
+ * update translation file (Diana Lau)
+
+ * Override discover model props (ssh24)
+
+ * Add test cases (ssh24)
+
+ * Add CODEOWNER file (Diana Lau)
+
+ * Allow typecasting upon altering prop (ssh24)
+
+ * Add missing require (Zak Barbuto)
+
+ * Revert change to commit and rollback (Zak Barbuto)
+
+ * Revert transaction tracking (Zak Barbuto)
+
+ * Update transaction test (Zak Barbuto)
+
+ * Remove require of Transaction (Zak Barbuto)
+
+ * Avoid connector for transaction tracking (Zak Barbuto)
+
+ * Fix operations directly on model #258 (Zak Barbuto)
+
+ * Add missing return (Zak Barbuto)
+
+ * Add test for #258 (Zak Barbuto)
+
+
+2017-07-17, Version 3.0.2
+=========================
+
+ * Use loopback-connector@^4.2.2 (Kevin Delisle)
+
+ * Allow to debug queries only (ssh24)
+
+ * Fix geo operator (ssh24)
+
+ * Add docs on numeric data type (ssh24)
+
+ * Add execute permission to setup.sh (Raymond Feng)
+
+ * Correct a <td> to </td> closing tag (Marco Galassi)
+
+ * Add connection pool settings doc to README.md (Marco Galassi)
+
+ * clean up postwithdate (ptrblgh)
+
+ * add tests for future regression (ptrblgh)
+
+ * add missing assertion (ptrblgh)
+
+ * add explicit typecasts to pattern matching (ptrblgh)
+
+ * Fix docker setup (#257) (Sakib Hasan)
+
+
+2017-05-15, Version 3.0.1
+=========================
+
+ * Add docker setup (#256) (Sakib Hasan)
+
+ * Allow explicit numeric datatype (#254) (Sakib Hasan)
+
+ * Allow non-id serial properties (#198) (zbarbuto)
+
+ * Revert PR #246 (#248) (Sakib Hasan)
+
+ * Add loopback-connector as peer dependencies (#246) (Russ Tyndall)
+
+ * Fix operations on ended transactions (zbarbuto)
+
+ * dbdefaults: Cleanup InvalidDefault def after test (Kevin Delisle)
+
+ * Reuse the data source to avoid too many clients (Raymond Feng)
+
+
+2017-03-31, Version 3.0.0
+=========================
+
+ * Remove console.log (Raymond Feng)
+
+ * Monkey patch generic-pool to work through errors (Russ Tyndall)
+
+ * Fix the escape char (Raymond Feng)
+
+ * Upgrade to loopback-connector@4.x (Loay)
+
+ * Add checkFieldAndIndex for table status (#228) (Sakib Hasan)
+
+ * Refactor migration methods (ssh24)
+
+ * Fix code style inconsistencies in ilike tests (Alireza Ahmadi)
+
+ * Improve tests for better code style consistency (Alireza Ahmadi)
+
+ * Add tests for pattern matching operators (Alireza Ahmadi)
+
+ * Add ILIKE functionality (Alireza Ahmadi)
+
+ * Refactor discovery models (Loay Gewily)
+
+ * merge in #216 (gregdingle)
+
+ * Fix unit tests (ssh24)
+
+ * Fix linting errors and unnesssary changes. (Diana Lau)
+
+ * remove done() calls in test (gregdingle)
+
+ * Added test. Ran run-tests. (gregdingle)
+
+ * Fix bug where settings for pg-pool were dropped (Greg Dingle)
+
+ * Update README with correct doc links, etc (Amir Jafarian)
+
+ * Add test for bulk transactions (Zak Barbuto)
+
+ * Use pg callback over connection.release (#109) (Zak Barbuto)
+
+ * Use pool.pool.release over pool.release (#109) (Zak Barbuto)
+
+ * Add test env information to README (Zak Barbuto)
+
+ * update README for local postgres setup (Diana Lau)
+
+ * Update postgresql.js (tmclouisluk)
+
+ * Fix bug when using postgresql 8.x (tmclouisluk)
+
+ * Replicate new issue_template from loopback (Siddhi Pai)
+
+ * Replicate issue_template from loopback repo (Siddhi Pai)
+
+ * Update LB connector version (Loay)
+
+ * Use unique param for affectedRows (Loay)
+
+ * Move info from docs into README (#199) (Rand McKinney)
+
+ * Update paid support URL (Siddhi Pai)
+
+ * Start 3.x + drop support for Node v0.10/v0.12 (siddhipai)
+
+ * Drop support for Node v0.10 and v0.12 (Siddhi Pai)
+
+ * Start the development of the next major version (Siddhi Pai)
+
+
 2016-10-14, Version 2.7.0
 =========================
 

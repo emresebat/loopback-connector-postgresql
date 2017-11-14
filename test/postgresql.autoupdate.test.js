@@ -5,13 +5,131 @@
 
 'use strict';
 var assert = require('assert');
-var ds;
+var _ = require('lodash');
+var ds, properties, SimpleEmployee, Emp1, Emp2;
 
 before(function() {
   ds = getDataSource();
 });
 
-describe('PostgreSQL connector', function() {
+describe('autoupdate', function() {
+  describe('should update properties', function() {
+    before(function(done) {
+      properties = {
+        name: {
+          type: String,
+        },
+        age: {
+          type: Number,
+        },
+        dateJoined: {
+          type: String,
+        },
+      };
+      SimpleEmployee = ds.define('SimpleEmployee', properties);
+      ds.automigrate(done);
+    });
+
+    after(function(done) {
+      SimpleEmployee.destroyAll(done);
+    });
+
+    it('get old model properties', function(done) {
+      ds.discoverModelProperties('simpleemployee', {schema: 'public'},
+        function(err, props) {
+          assert(!err);
+          assert.equal(props[0].dataType, 'text');
+          assert.equal(props[1].dataType, 'integer');
+          assert.equal(props[2].dataType, 'text');
+          done();
+        });
+    });
+
+    it('perform autoupdate and get new model properties', function(done) {
+      properties.age.type = String;
+      properties.dateJoined.type = Date;
+      SimpleEmployee = ds.define('SimpleEmployee', properties);
+      ds.autoupdate(function(err) {
+        assert(!err);
+        ds.discoverModelProperties('simpleemployee', {schema: 'public'},
+          function(err, props) {
+            assert(!err);
+            assert.equal(props[0].dataType, 'text');
+            assert.equal(props[1].dataType, 'text');
+            assert.equal(props[2].dataType, 'timestamp with time zone');
+            done();
+          });
+      });
+    });
+  });
+
+  describe('update model with same table name but different schema', function() {
+    before(function(done) {
+      properties = {
+        name: {
+          type: String,
+        },
+        age: {
+          type: Number,
+        },
+      };
+      Emp1 = ds.define('Employee', properties, {
+        'postgresql': {
+          'table': 'employee',
+          'schema': 'schema1',
+        }});
+      Emp2 = ds.define('Employee1', properties, {
+        'postgresql': {
+          'table': 'employee',
+          'schema': 'schema2',
+        }});
+      ds.automigrate(done);
+    });
+
+    after(function(done) {
+      Emp1.destroyAll(function(err) {
+        assert(!err);
+        Emp2.destroyAll(done);
+      });
+    });
+
+    it('should autoupdate successfully', function(done) {
+      properties['code'] = {
+        type: String,
+      };
+      Emp1 = ds.define('Employee', properties, {
+        'postgresql': {
+          'table': 'employee',
+          'schema': 'schema1',
+        }});
+      ds.autoupdate('Employee', function(err) {
+        assert(!err);
+        ds.discoverModelProperties('employee', {schema: 'schema1'},
+          function(err, props) {
+            assert(!err);
+            assert(props);
+            props = _.filter(props, function(prop) {
+              return prop.columnName === 'code';
+            });
+            assert(props);
+            assert(props[0].columnName);
+            assert.equal(props[0].columnName, 'code');
+            assert.equal(props[0].dataType, 'text');
+            ds.discoverModelProperties('employee', {schema: 'schema2'},
+              function(err, props) {
+                assert(!err);
+                assert(props);
+                props = _.filter(props, function(prop) {
+                  return prop.columnName === 'code';
+                });
+                assert.equal(props.length, 0);
+                done();
+              });
+          });
+      });
+    });
+  });
+
   it('should auto migrate/update tables', function(done) {
     var schema_v1 =
       {

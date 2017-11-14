@@ -53,10 +53,51 @@ describe('transactions', function() {
         function(err, posts) {
           if (err) return done(err);
           posts.length.should.be.eql(count);
-          done();
+          // Make sure both find() and count() behave the same way
+          Post.count(where, options,
+            function(err, result) {
+              if (err) return done(err);
+              result.should.be.eql(count);
+              done();
+            });
         });
     };
   }
+
+  describe('bulk', function() {
+    it('should work with bulk transactions', function(done) {
+      var completed = 0;
+      var concurrent = 20;
+      for (var i = 0; i <= concurrent; i++) {
+        var post = {title: 'tb' + i, content: 'cb' + i};
+        var create = createPostInTx(post);
+        Transaction.begin(db.connector, Transaction.SERIALIZABLE,
+          function(err, tx) {
+            if (err) return done(err);
+            Post.create(post, {transaction: tx},
+              function(err, p) {
+                if (err) {
+                  return done(err);
+                } else {
+                  tx.commit(function(err) {
+                    if (err) {
+                      return done(err);
+                    }
+                    completed++;
+                    checkResults();
+                  });
+                }
+              });
+          });
+      }
+
+      function checkResults() {
+        if (completed === concurrent) {
+          done();
+        }
+      }
+    });
+  });
 
   describe('commit', function() {
     var post = {title: 't1', content: 'c1'};
@@ -74,6 +115,33 @@ describe('transactions', function() {
     it('should see the committed insert', expectToFindPosts(post, 1));
   });
 
+  describe('on the model', function() {
+    var p1Content = {title: 'p1', content: 'post-a'};
+    var p2Content = {title: 'p2', content: 'post-a'};
+
+    before(function(done) {
+      Post.create(p1Content, function(err, p1) {
+        Post.create(p2Content, function(err, p2) {
+          done();
+        });
+      });
+    });
+
+    it('should work when operating directly on the model', function(done) {
+      Post.beginTransaction(Transaction.READ_COMMITTED, function(err, tx) {
+        Post.updateAll({content: 'post-a'}, {content: 'post-b'}, {transaction: tx},
+          function(err, changes) {
+            tx.commit(function(err) {
+              if (err) {
+                return done(err);
+              }
+              done();
+            });
+          });
+      });
+    });
+  });
+
   describe('rollback', function() {
     var post = {title: 't2', content: 'c2'};
     before(createPostInTx(post));
@@ -88,5 +156,30 @@ describe('transactions', function() {
     });
 
     it('should not see the rolledback insert', expectToFindPosts(post, 0));
+  });
+
+  describe('finished', function() {
+    var post = {title: 't2', content: 'c2'};
+    beforeEach(createPostInTx(post));
+
+    it('should throw an error when creating in a committed transaction', function(done) {
+      currentTx.commit(function(err) {
+        if (err) return done(err);
+        Post.create({title: 't4', content: 'c4'}, {transaction: currentTx}, function(err, post) {
+          if (!err) return done(new Error('should throw error'));
+          done();
+        });
+      });
+    });
+
+    it('should throw an error when creating in a rolled back transaction', function(done) {
+      currentTx.rollback(function(err) {
+        if (err) return done(err);
+        Post.create({title: 't4', content: 'c4'}, {transaction: currentTx}, function(err, post) {
+          if (!err) return done(new Error('should throw error'));
+          done();
+        });
+      });
+    });
   });
 });
