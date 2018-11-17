@@ -1,3 +1,51 @@
+2018-11-09, Version 3.5.0
+=========================
+
+ * Fixed line length to pass lint (ataft)
+
+ * Fix hard-coded "pkName" column in queries (ataft)
+
+ * Modify type 'double precision' to map to float (ataft)
+
+
+2018-07-16, Version 3.4.0
+=========================
+
+ * Drop Node 4 in CI (Diana Lau)
+
+ * [WebFM] cs/pl/ru translation (candytangnb)
+
+
+2018-05-25, Version 3.3.2
+=========================
+
+ * rebase the code to latest master (sahil)
+
+ * typo (Lambdac0re)
+
+
+2018-04-26, Version 3.3.1
+=========================
+
+ * update CODEOWNERS (Diana Lau)
+
+ * linting updates (Tim Jones)
+
+ * add support for UPDATE RETURNING (Tim Jones)
+
+
+2018-01-12, Version 3.3.0
+=========================
+
+ * Revert "4.0.0" (Miroslav Bajtoš)
+
+
+2018-01-12, Version 4.0.0
+=========================
+
+ * Include the SSL Property (ataft)
+
+
 2017-11-13, Version 3.2.0
 =========================
 
